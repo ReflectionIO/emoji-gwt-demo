@@ -1,4 +1,4 @@
-emoji-gwt-demo
-==============
+emoji-gwt
+=========
 
-Emoji for gwt demo
+Emoji for gwt
