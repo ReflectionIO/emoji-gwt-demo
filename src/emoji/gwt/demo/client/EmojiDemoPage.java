@@ -13,6 +13,7 @@ import java.util.Random;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -21,11 +22,13 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
@@ -35,6 +38,9 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 import emoji.gwt.emoji.Emoji;
+import emoji.gwt.emoji.res.Apple;
+import emoji.gwt.emoji.res.Noto;
+import emoji.gwt.emoji.res.Twemoji;
 
 /**
  * @author William Shakour (billy1380)
@@ -47,7 +53,7 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 	interface EmojiDemoPageUiBinder extends UiBinder<Widget, EmojiDemoPage> {}
 
 	private static final int TIMER_TIMEOUT = 15000;
-	
+
 	MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
 	@UiField(provided = true) SuggestBox nameField = new SuggestBox(oracle);
 	@UiField(provided = true) CellList<String> emojiLookup = new CellList<String>(new AbstractCell<String>() {
@@ -65,10 +71,13 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 		}
 	});
 	@UiField Image image;
+	@UiField ListBox cboTheme;
 
 	private SingleSelectionModel<String> model;
 	private Timer timer;
 	private Random random = new Random();
+
+	private int themeIndex = 0;
 
 	public EmojiDemoPage() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -90,7 +99,7 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 		model = new com.google.gwt.view.client.SingleSelectionModel<String>();
 		emojiLookup.setSelectionModel(model);
 		model.addSelectionChangeHandler(this);
-		
+
 		timer = new Timer() {
 
 			@Override
@@ -98,14 +107,14 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 				setImage(keywords.get(random.nextInt(keywords.size())));
 			}
 		};
-		
+
 		setImage(keywords.get(random.nextInt(keywords.size())));
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.google.gwt.view.client.SelectionChangeEvent.Handler#onSelectionChange(com.google.gwt.view.client.SelectionChangeEvent)
+	 * @see com.google.gwt.view.client.SelectionChangeEvent.Handler#onSelectionChange (com.google.gwt.view.client.SelectionChangeEvent)
 	 */
 	@Override
 	public void onSelectionChange(SelectionChangeEvent event) {
@@ -121,7 +130,7 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 		timer.cancel();
 
 		nameField.setText(selectedObject);
-		
+
 		ImageResource i = Emoji.get().resource(selectedObject);
 		if (i != null) {
 			image.setResource(i);
@@ -133,7 +142,7 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.google.gwt.event.logical.shared.SelectionHandler#onSelection(com.google.gwt.event.logical.shared.SelectionEvent)
+	 * @see com.google.gwt.event.logical.shared.SelectionHandler#onSelection(com. google.gwt.event.logical.shared.SelectionEvent)
 	 */
 	@Override
 	public void onSelection(SelectionEvent<Suggestion> event) {
@@ -143,11 +152,35 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.google.gwt.event.logical.shared.ValueChangeHandler#onValueChange(com.google.gwt.event.logical.shared.ValueChangeEvent)
+	 * @see com.google.gwt.event.logical.shared.ValueChangeHandler#onValueChange( com.google.gwt.event.logical.shared.ValueChangeEvent)
 	 */
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		setImage(event.getValue());
+	}
+
+	@UiHandler("cboTheme")
+	void onCboThemeValueChanged(ChangeEvent event) {
+		if (themeIndex != cboTheme.getSelectedIndex()) {
+			themeIndex = cboTheme.getSelectedIndex();
+		}
+
+		switch (themeIndex) {
+		case 0:
+			Emoji.get(Apple.INSTANCE);
+			break;
+		case 1:
+			Emoji.get(Noto.INSTANCE);
+			break;
+		case 2:
+			Emoji.get(Twemoji.INSTANCE);
+			break;
+		default:
+			break;
+		}
+
+		emojiLookup.redraw();
+		setImage(nameField.getText());
 	}
 
 }

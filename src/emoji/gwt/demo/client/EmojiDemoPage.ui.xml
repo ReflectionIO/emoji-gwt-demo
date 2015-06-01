@@ -1,5 +1,6 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client">
 	<ui:style>
 	body {
 		font-family: 'Noto Sans', sans-serif;
@@ -19,10 +20,21 @@
 		<p>This simple demo showing emoji lookup on gwt.</p>
 		<p>
 			The library source is located at
-			<a href="https://github.com/ReflectionIO/emoji-gwt">ReflectionIO/emoji-gwt</a>
+			<a href="https://github.com/billy1380/emoji-gwt">billy1380/emoji-gwt</a>
 			.
 		</p>
 
+		<g:ListBox ui:field="cboTheme">
+			<g:item value="1">
+				Apple (iOS, Mac OS X)
+			</g:item>
+			<g:item value="2">
+				Noto (Google)
+			</g:item>
+			<g:item value="3">
+				Twemoji (Twitter)
+			</g:item>
+		</g:ListBox>
 		<g:SuggestBox ui:field="nameField" />
 		<g:Image ui:field="image" styleName="{style.smaller}" />
 
