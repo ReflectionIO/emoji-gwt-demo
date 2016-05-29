@@ -38,9 +38,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 import emoji.gwt.emoji.Emoji;
-import emoji.gwt.emoji.res.Apple;
-import emoji.gwt.emoji.res.Noto;
-import emoji.gwt.emoji.res.Twemoji;
+import emoji.gwt.emoji.Emoji.Ready;
 
 /**
  * @author William Shakour (billy1380)
@@ -84,31 +82,37 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 
 		BootstrapGwtSuggestBox.INSTANCE.styles().ensureInjected();
 
-		oracle.addAll(Emoji.get().keyWords());
-		nameField.addValueChangeHandler(this);
-		nameField.addSelectionHandler(this);
-
-		// Focus the cursor on the name field when the app loads
-		nameField.setFocus(true);
-
-		final List<String> keywords = new ArrayList<String>(Emoji.get().keyWords());
-		emojiLookup.setPageSize(Integer.MAX_VALUE);
-		ListDataProvider<String> provider = new ListDataProvider<String>(keywords);
-		provider.addDataDisplay(emojiLookup);
-
-		model = new com.google.gwt.view.client.SingleSelectionModel<String>();
-		emojiLookup.setSelectionModel(model);
-		model.addSelectionChangeHandler(this);
-
-		timer = new Timer() {
+		Emoji.get(null, new Ready() {
 
 			@Override
-			public void run() {
+			public void ready(Emoji emoji) {
+				oracle.addAll(Emoji.get().keyWords());
+				nameField.addValueChangeHandler(EmojiDemoPage.this);
+				nameField.addSelectionHandler(EmojiDemoPage.this);
+
+				// Focus the cursor on the name field when the app loads
+				nameField.setFocus(true);
+
+				final List<String> keywords = new ArrayList<String>(Emoji.get().keyWords());
+				emojiLookup.setPageSize(Integer.MAX_VALUE);
+				ListDataProvider<String> provider = new ListDataProvider<String>(keywords);
+				provider.addDataDisplay(emojiLookup);
+
+				model = new com.google.gwt.view.client.SingleSelectionModel<String>();
+				emojiLookup.setSelectionModel(model);
+				model.addSelectionChangeHandler(EmojiDemoPage.this);
+
+				timer = new Timer() {
+
+					@Override
+					public void run() {
+						setImage(keywords.get(random.nextInt(keywords.size())));
+					}
+				};
+
 				setImage(keywords.get(random.nextInt(keywords.size())));
 			}
-		};
-
-		setImage(keywords.get(random.nextInt(keywords.size())));
+		});
 	}
 
 	/*
@@ -165,22 +169,30 @@ public class EmojiDemoPage extends Composite implements SelectionChangeEvent.Han
 			themeIndex = cboTheme.getSelectedIndex();
 		}
 
+		String name = null;
 		switch (themeIndex) {
 		case 0:
-			Emoji.get(Apple.INSTANCE);
+			name = "apple";
 			break;
 		case 1:
-			Emoji.get(Noto.INSTANCE);
+			name = "noto";
 			break;
 		case 2:
-			Emoji.get(Twemoji.INSTANCE);
+			name = "twemoji";
 			break;
 		default:
 			break;
 		}
 
-		emojiLookup.redraw();
-		setImage(nameField.getText());
+		Emoji.get(name, new Ready() {
+
+			@Override
+			public void ready(Emoji emoji) {
+				emojiLookup.redraw();
+				setImage(nameField.getText());
+			}
+		});
+
 	}
 
 }
